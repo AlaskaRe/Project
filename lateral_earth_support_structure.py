@@ -29,12 +29,12 @@ class LateralEarthSupport(object):
         self._structure_length = structure_length
         self._excavation_depth = excavation_depth
 
-        self.struct_range = sc_range.copy()
-        self.struct_range[1, 0] = self._project_name
-        self.struct_range[1, 1] = self._structure_type
-        self.struct_range[1, 2] = self._structure_length
-        self.struct_range[1, 3] = self._excavation_depth
-        self.struct_range[1, 4] = self._project_name + self._structure_type
+        self._struct_range = sc_range.copy()
+        self._struct_range[1, 0] = self._project_name
+        self._struct_range[1, 1] = self._structure_type
+        self._struct_range[1, 2] = self._structure_length
+        self._struct_range[1, 3] = self._excavation_depth
+        self._struct_range[1, 4] = self._project_name + self._structure_type
     @property
     def project_name(self):
         """"项目名称"""
@@ -88,17 +88,22 @@ class LateralEarthSupport(object):
     """
     @property
     def sturct_range(self):
-        arrange = self._struct_range.copy()
+        arrange = self.__struct_range.copy()
         return arrange
     """
 
+
+class FrameStructure(np.ndarray, ):
+    
+
+    def __init__(self, )
 def test():
     dem01 = LateralEarthSupport
     dem01.project_name = '1-1'
     dem01.structure_type = LATERAL_EARTH_SUPPORT_STRUCTURE[2]
     dem01.structure_length = 100
     dem01.excavation_depth = 6.0
-    arr = dem01.struct_range
+    arr = dem01._struct_range
     for i in arr.flat:
         print(i)
 
