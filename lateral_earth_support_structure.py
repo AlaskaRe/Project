@@ -6,13 +6,22 @@ import numpy as np
 # 定义一些常量，这些常量不仅在本模组会用到，在其他模组也会用到
 
 
+# 常量， 一些基础设置
+ACCURACY_FLOAT = 4
 # 常量，基坑支护类型
 
 # 支护结构共11种
+
 LATERAL_EARTH_SUPPORT_STRUCTURE = np.array(['放坡开挖', '土钉墙', '水泥土重力式挡墙', '排桩', '地连墙','SMW', '钢板桩', '混凝土支撑', '钢支撑', '锚杆', '逆作法'], dtype= object) 
 
 # 结构框架数组：（2，5）
 FRAME_STRUCTURE = np.array([['支护单元', '支护类型', '支护长度/m', '基坑深度', '标识ID'], ['', '', '', '', '']],dtype= object)
+
+# 钢筋级别
+STEEL_CLASS = np.array(['HPB300', 'HRB335', 'HRBF335', 'HRB400', 'HRBF400', 'RRB400', 'HRB500', 'HRBF500'], dtype = object)
+
+FRAME_STEEL = np.array([['类别'，'钢筋强度', '直径/mm', '参数', '总长度/m', '总重量/kg'], [''，'', '', '', '', '']], dtype= object)
+
 
 class LateralEarthSupport(object):
     """基坑支护结构类"""
@@ -91,6 +100,79 @@ class LateralEarthSupport(object):
         struct_range[1,4] = self.project_name + self.structure_type
 
         return struct_range
+
+class Steel(object):
+
+    """钢筋对象"""
+
+    def __init__(self, steel_usage = '钢筋', length = 0, strength_type = STEEL_CLASS[0], steel_diameter = 0)
+        
+        self._steel_usage = steel_usage
+        self._total_length = length
+        self._strength_class = strength_type
+        self._steel_diameter = steel_diameter
+
+    @property
+    def total_length(self):
+        """钢筋总长度"""
+
+        return self._total_length
+
+    @total_length.setter
+    def total_length(self, length_value):
+
+        if not isinstance(length_value, float):
+            raise TypeError("长度必须是数字")
+        elif length_value <0 :
+            raise ValueError('长度必须是大于零的数字')
+        else:
+            self._total_length = length_value
+    
+    @property
+    def strength_type(self):
+        """钢筋强度"""
+
+        return self._strength_class
+    
+    @strength_type.setter
+    def strength_type(self, strength_type_value):
+        
+        if strength_type_value  in STEEL_CLASS:
+            self._strength_class = strength_type_value
+        elif strength_type_value not in STEEL_CLASS:
+            rasie ValueError("不属于指定类型")
+    
+    @property
+    def steel_diameter(self):
+
+        """钢筋直径"""
+        return self._steel_diameter
+    
+    @steel_diameter.setter
+    def steel_diameter(self, diameter_value):
+        if not isinstance(diameter_value, float):
+
+            raise TypeError("钢筋直径必须是数字")
+        elif diameter_value <0:
+
+            raise ValueError("钢筋直径必须是大于零的数字")
+        elif isinstance(diameter_value, float) and diameter_value >= 0:
+
+            self._steel_diameter = diameter_value
+    
+    def generate_weight(self):
+        
+        total_weight = round(self.total_length * self.steel_diameter * self.steel_diameter * 0.00617, ) 
+
+    def create_range_steel(self):
+        
+        range_steel = FRAME_STEEL.copy()
+        range_steel[1,0] = self._steel_usage
+        range_steel[1,0] = self._strength_class
+        range_steel[1,0] = self._steel_diameter
+        range_steel[1,0] = self._total_length
+        
+
 
 
 def test():
