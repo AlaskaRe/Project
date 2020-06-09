@@ -11,12 +11,13 @@ import numpy as np
 LATERAL_EARTH_SUPPORT_STRUCTURE = np.array(['放坡开挖', '土钉墙', '水泥土重力式挡墙', '排桩', '地连墙','SMW', '钢板桩', '混凝土支撑', '钢支撑', '锚杆', '逆作法']) 
 
 # 结构框架数组：（2，5）
+FRAME_CAP_STRUCT = 
 FRAME_STRUCTURE = np.array([['支护单元', '支护类型', '支护长度/m', '基坑深度', '标识ID'], ['', '', '', '', ''] ])
 
 class LateralEarthSupport(object):
     """基坑支护结构类"""
 
-    def __init__(self, project_name = '', structure_type = LATERAL_EARTH_SUPPORT_STRUCTURE[0], structure_length = 0.0, excavation_depth = 0.0, sc_range = FRAME_STRUCTURE.copy()):
+    def __init__(self, project_name = '', structure_type = LATERAL_EARTH_SUPPORT_STRUCTURE[0], structure_length = 0.0, excavation_depth = 0.0):
 
 
         # 初始化默认值
@@ -29,12 +30,6 @@ class LateralEarthSupport(object):
         self._structure_length = structure_length
         self._excavation_depth = excavation_depth
 
-        self._struct_range = sc_range.copy()
-        self._struct_range[1, 0] = self._project_name
-        self._struct_range[1, 1] = self._structure_type
-        self._struct_range[1, 2] = self._structure_length
-        self._struct_range[1, 3] = self._excavation_depth
-        self._struct_range[1, 4] = self._project_name + self._structure_type
     @property
     def project_name(self):
         """"项目名称"""
@@ -85,26 +80,21 @@ class LateralEarthSupport(object):
             raise ValueError('excavation depth must between 0~100m')
         else:
             self._excavation_depth = excav_depth_value
-    """
-    @property
-    def sturct_range(self):
-        arrange = self.__struct_range.copy()
-        return arrange
-    """
 
 
-class FrameStructure(np.ndarray, ):
-    
+def create_range(LateralEarthSupport):
 
-    def __init__(self, )
+    structRange = FRAME_STRUCTURE.copy()
+    structRange()
+
+
 def test():
+
     dem01 = LateralEarthSupport
     dem01.project_name = '1-1'
     dem01.structure_type = LATERAL_EARTH_SUPPORT_STRUCTURE[2]
     dem01.structure_length = 100
     dem01.excavation_depth = 6.0
-    arr = dem01._struct_range
-    for i in arr.flat:
-        print(i)
+
 
 test()
