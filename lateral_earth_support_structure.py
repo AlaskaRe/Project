@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 import numpy as np
 
 
@@ -8,11 +9,10 @@ import numpy as np
 # 常量，基坑支护类型
 
 # 支护结构共11种
-LATERAL_EARTH_SUPPORT_STRUCTURE = np.array(['放坡开挖', '土钉墙', '水泥土重力式挡墙', '排桩', '地连墙','SMW', '钢板桩', '混凝土支撑', '钢支撑', '锚杆', '逆作法']) 
+LATERAL_EARTH_SUPPORT_STRUCTURE = np.array(['放坡开挖', '土钉墙', '水泥土重力式挡墙', '排桩', '地连墙','SMW', '钢板桩', '混凝土支撑', '钢支撑', '锚杆', '逆作法'], dtype= object) 
 
 # 结构框架数组：（2，5）
-FRAME_CAP_STRUCT = 
-FRAME_STRUCTURE = np.array([['支护单元', '支护类型', '支护长度/m', '基坑深度', '标识ID'], ['', '', '', '', ''] ])
+FRAME_STRUCTURE = np.array([['支护单元', '支护类型', '支护长度/m', '基坑深度', '标识ID'], ['', '', '', '', '']],dtype= object)
 
 class LateralEarthSupport(object):
     """基坑支护结构类"""
@@ -81,11 +81,16 @@ class LateralEarthSupport(object):
         else:
             self._excavation_depth = excav_depth_value
 
+    def create_range_struct(self):
 
-def create_range(LateralEarthSupport):
+        struct_range = FRAME_STRUCTURE.copy()
+        struct_range[1,0] = self.project_name
+        struct_range[1,1] = self.structure_type
+        struct_range[1,2] = self.structure_length
+        struct_range[1,3] = self.excavation_depth
+        struct_range[1,4] = self.project_name + self.structure_type
 
-    structRange = FRAME_STRUCTURE.copy()
-    structRange()
+        return struct_range
 
 
 def test():
@@ -95,6 +100,9 @@ def test():
     dem01.structure_type = LATERAL_EARTH_SUPPORT_STRUCTURE[2]
     dem01.structure_length = 100
     dem01.excavation_depth = 6.0
+    arr = dem01.create_range_struct(dem01)
+    for i in arr.flat:
+        print(i)
 
 
 test()
