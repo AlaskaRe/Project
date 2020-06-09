@@ -7,6 +7,7 @@ import numpy as np
 
 
 # 常量， 一些基础设置
+# 浮点数精度
 ACCURACY_FLOAT = 4
 # 常量，基坑支护类型
 
@@ -17,10 +18,10 @@ LATERAL_EARTH_SUPPORT_STRUCTURE = np.array(['放坡开挖', '土钉墙', '水泥
 # 结构框架数组：（2，5）
 FRAME_STRUCTURE = np.array([['支护单元', '支护类型', '支护长度/m', '基坑深度', '标识ID'], ['', '', '', '', '']],dtype= object)
 
-# 钢筋级别
+# 钢筋
 STEEL_CLASS = np.array(['HPB300', 'HRB335', 'HRBF335', 'HRB400', 'HRBF400', 'RRB400', 'HRB500', 'HRBF500'], dtype = object)
 
-FRAME_STEEL = np.array([['类别'，'钢筋强度', '直径/mm', '参数', '总长度/m', '总重量/kg'], [''，'', '', '', '', '']], dtype= object)
+FRAME_STEEL = np.array([['用途', '钢筋强度', '直径/mm', '参数', '总长度/m', '总重量/kg'], ['', '', '', '', '', '']], dtype= object)
 
 
 class LateralEarthSupport(object):
@@ -105,12 +106,17 @@ class Steel(object):
 
     """钢筋对象"""
 
-    def __init__(self, steel_usage = '钢筋', length = 0, strength_type = STEEL_CLASS[0], steel_diameter = 0)
+    def __init__(self, steel_usage = '钢筋', strength_type = STEEL_CLASS[0], steel_diameter = 0, total_length = 0.0, total_weight = 0.0):
         
         self._steel_usage = steel_usage
-        self._total_length = length
         self._strength_class = strength_type
         self._steel_diameter = steel_diameter
+        self._total_length = total_length
+        self._total_weight = total_weight
+
+    @property
+    def steel_usage(self):
+        return self._steel_usage
 
     @property
     def total_length(self):
@@ -160,18 +166,63 @@ class Steel(object):
 
             self._steel_diameter = diameter_value
     
-    def generate_weight(self):
+    @property
+    def total_weight(self):
         
-        total_weight = round(self.total_length * self.steel_diameter * self.steel_diameter * 0.00617, ) 
+        self._total_weight = round(self.total_length * self.steel_diameter * self.steel_diameter * 0.00617, ACCURACY_FLOAT)
+        
+        return self._total_weight
 
     def create_range_steel(self):
         
         range_steel = FRAME_STEEL.copy()
         range_steel[1,0] = self._steel_usage
-        range_steel[1,0] = self._strength_class
-        range_steel[1,0] = self._steel_diameter
-        range_steel[1,0] = self._total_length
+        range_steel[1,1] = self._strength_class
+        range_steel[1,2] = self._steel_diameter
+        range_steel[1,3] = self._steel_usage + self._strength_class + self._steel_diameter
+        range_steel[1,4] = self._total_length
+        range_steel[1,5] = self._total_weight
+
+class SlopeRatio(LateralEarthSupport):
+
+    """基坑支护——放坡开挖"""
+    def __init__(self, slope_grade = 1, slope_shoulder = 0.0):
+
+        LateralEarthSupport.__init__(self, project_name = '', structure_type = LATERAL_EARTH_SUPPORT_STRUCTURE[0], structure_length = 0.0, excavation_depth = 0.0)
+        self._slope_grade = slope_grade
+        self._slope_shoulder = slope_shoulder
+    
+    @property
+    def slope_grade(self):
+
+        """放坡级数"""
+        return self._slope_grade
+    
+    @slope_grade.setter
+    def slope_grade(self, slp_grade_value):
+
+        if not isinstance(slp_grade_value, int):
+            raise TypeError("坡级数必须整数")
+        elif slp_grade_value <1:
+            raise ValueError("坡级数至少是1")
+        elif isinstance(slp_grade_value, int) and slp_grade_value >= 0:
+
+            self._slope_grade = slp_grade_value
+
+    @property
+    def sloper_shoulder(self):
+
+        return self._slope_shoulder
+    
+    @sloper_shoulder.setter
+    def sloper_shoulder(self, slp_shder_value):
         
+        if not isinstance(slp_shder_value, float):
+            raise TypeError("坡肩长度必须是数字")
+        elif slp_shder_value <0 :
+            raise ValueError("坡肩长度必须是大于零的数字")
+        elif isinstance(slp_shder_value, float) and slp_shder_value >= 0:
+            self._slope_shoulder = slp_shder_value
 
 
 
