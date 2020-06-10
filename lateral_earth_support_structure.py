@@ -22,6 +22,7 @@ FRAME_STRUCTURE = np.array([['支护单元', '支护类型', '支护长度/m', '
 STEEL_CLASS = np.array(['HPB300', 'HRB335', 'HRBF335', 'HRB400', 'HRBF400', 'RRB400', 'HRB500', 'HRBF500'], dtype = object)
 
 FRAME_STEEL = np.array([['用途', '钢筋强度', '直径/mm', '参数', '总长度/m', '总重量/kg'], ['', '', '', '', '', '']], dtype= object)
+# 放坡开挖
 
 
 class LateralEarthSupport(object):
@@ -146,7 +147,7 @@ class Steel(object):
         if strength_type_value  in STEEL_CLASS:
             self._strength_class = strength_type_value
         elif strength_type_value not in STEEL_CLASS:
-            rasie ValueError("不属于指定类型")
+            raise ValueError('不属于指定类型')
     
     @property
     def steel_diameter(self):
@@ -186,11 +187,10 @@ class Steel(object):
 class SlopeRatio(LateralEarthSupport):
 
     """基坑支护——放坡开挖"""
-    def __init__(self, slope_grade = 1, slope_shoulder = 0.0):
+    def __init__(self, slope_grade = 1):
 
         LateralEarthSupport.__init__(self, project_name = '', structure_type = LATERAL_EARTH_SUPPORT_STRUCTURE[0], structure_length = 0.0, excavation_depth = 0.0)
         self._slope_grade = slope_grade
-        self._slope_shoulder = slope_shoulder
     
     @property
     def slope_grade(self):
@@ -206,16 +206,27 @@ class SlopeRatio(LateralEarthSupport):
         elif slp_grade_value <1:
             raise ValueError("坡级数至少是1")
         elif isinstance(slp_grade_value, int) and slp_grade_value >= 0:
-
             self._slope_grade = slp_grade_value
-
+    
+    def create_range_slope(self):
+        range_slope = np.ndarray(self.slope_grade, 5)
+        range_slope[0, 0] = '序号（从上至下）'
+        range_slope[0, 1] = '坡高/m'
+        range_slope[0, 2] = '水平距离/m'
+        range_slope[0, 3] = '坡率系数'
+        range_slope[0, 4] = '坡肩/m'
+        for i in range(1, self.slope_grade):
+            range_slope[i, 0] = i
+        return range_slope
+    
+    """
     @property
     def sloper_shoulder(self):
 
         return self._slope_shoulder
     
     @sloper_shoulder.setter
-    def sloper_shoulder(self, slp_shder_value):
+    def sloper_shoulder(self, slp_shder_value): 
         
         if not isinstance(slp_shder_value, float):
             raise TypeError("坡肩长度必须是数字")
@@ -223,7 +234,8 @@ class SlopeRatio(LateralEarthSupport):
             raise ValueError("坡肩长度必须是大于零的数字")
         elif isinstance(slp_shder_value, float) and slp_shder_value >= 0:
             self._slope_shoulder = slp_shder_value
-
+    
+    """
 
 
 def test():
@@ -236,6 +248,16 @@ def test():
     arr = dem01.create_range_struct(dem01)
     for i in arr.flat:
         print(i)
+    
+    demo_slope = SlopeRatio
+    demo_slope.project_name = '2-2'
+    demo_slope.structure_length = 200
+    demo_slope.excavation_depth = 10
+    arr_slope = demo_slope.create_range_struct(demo_slope)
+    demo_slope.slope_grade = 2
+    print(demo_slope.slope_grade)
+    for n in arr_slope.flat:
+        print(n)
 
 
 test()
